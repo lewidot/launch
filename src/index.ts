@@ -1,5 +1,5 @@
 // index.ts
-import { Elysia, status } from 'elysia';
+import { Hono } from 'hono';
 import { SSEBroker } from './sse';
 import { PlaywrightRunner } from './playwright';
 
@@ -10,11 +10,12 @@ const runner = new PlaywrightRunner({
 	onStateChange: (state, code) => sseBroker.sendEvent('status', JSON.stringify({ state, code }))
 });
 
-new Elysia()
-	.get('/events', ({ request }) => {
+const app = new Hono()
+	.get('/events', (c) => {
 		console.log('[http] GET /events');
 		const { readable, unsubscribe } = sseBroker.subscribe();
-		request.signal.addEventListener('abort', unsubscribe);
+
+		c.req.raw.signal.onabort = unsubscribe;
 
 		return new Response(readable, {
 			headers: {
@@ -23,16 +24,19 @@ new Elysia()
 			}
 		});
 	})
-	.get('/start', () => {
+	.get('/start', (c) => {
 		console.log('[http] GET /start');
 		const result = runner.start();
 		if (!result.ok) {
 			console.log('[http] start failed:', result.error);
-			return status(409, { error: result.error });
+			return c.json({ error: result.error }, 409);
 		}
 		console.log('[http] start ok');
-		return { status: 'started' };
-	})
-	.listen(3000);
+		return c.json({ status: 'started' });
+	});
 
-console.log('http://localhost:3000');
+export default {
+	port: 3000,
+	idleTimeout: 60,
+	fetch: app.fetch
+};
