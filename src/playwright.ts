@@ -57,7 +57,6 @@ export class PlaywrightRunner {
 			}
 			if (value) {
 				const text = decoder.decode(value, { stream: true });
-				console.log(`[playwright] length: ${text.length}`);
 				this.handler.onOutput(text);
 			}
 		}

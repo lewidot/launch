@@ -33,9 +33,6 @@ export class SSEBroker {
 	}
 
 	sendEvent(event: string, data: string) {
-		console.log(
-			`[sse] broadcast "${event}" to ${this.clients.size} clients, length: ${data.length}`
-		);
 		const msg = this.encoder.encode(`event: ${event}\ndata: ${data}\n\n`);
 		this.broadcast(msg);
 	}
