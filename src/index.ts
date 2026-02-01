@@ -1,5 +1,6 @@
 // index.ts
 import { Hono } from 'hono';
+import { logger } from 'hono/logger';
 import { SSEBroker } from './sse';
 import { PlaywrightRunner } from './playwright';
 
@@ -11,8 +12,8 @@ const runner = new PlaywrightRunner({
 });
 
 const app = new Hono()
+	.use(logger())
 	.get('/events', (c) => {
-		console.log('[http] GET /events');
 		const { readable, unsubscribe } = sseBroker.subscribe();
 
 		c.req.raw.signal.onabort = unsubscribe;
@@ -25,13 +26,10 @@ const app = new Hono()
 		});
 	})
 	.get('/start', (c) => {
-		console.log('[http] GET /start');
 		const result = runner.start();
 		if (!result.ok) {
-			console.log('[http] start failed:', result.error);
 			return c.json({ error: result.error }, 409);
 		}
-		console.log('[http] start ok');
 		return c.json({ status: 'started' });
 	});
 
