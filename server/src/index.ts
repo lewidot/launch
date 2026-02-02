@@ -38,6 +38,8 @@ const app = new Hono()
 	// Fallback to index.html for SPA routing
 	.use('*', serveStatic({ path: './public/index.html' }));
 
+export type AppType = typeof app;
+
 export default {
 	port: 3000,
 	idleTimeout: 60,

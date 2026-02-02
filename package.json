@@ -19,5 +19,8 @@
 	"devDependencies": {
 		"bun-types": "latest",
 		"prettier": "^3.8.1"
+	},
+	"dependencies": {
+		"hono": "^4.11.7"
 	}
 }
