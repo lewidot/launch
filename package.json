@@ -18,7 +18,9 @@
 	},
 	"devDependencies": {
 		"bun-types": "latest",
-		"prettier": "^3.8.1"
+		"prettier": "^3.8.1",
+		"prettier-plugin-svelte": "^3.4.1",
+		"prettier-plugin-tailwindcss": "^0.7.2"
 	},
 	"dependencies": {
 		"hono": "^4.11.7"

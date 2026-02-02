@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { client } from './api';
+	import { client } from './api';
 
-  let status = $state('');
-  let loading = $state(false);
+	let status = $state('');
+	let loading = $state(false);
 
-  async function startPlaywright() {
+	async function startPlaywright() {
 		loading = true;
 		const res = await client.api.start.$get();
 
@@ -18,12 +18,11 @@
 		loading = false;
 	}
 
-  let count: number = $state(0)
-  const increment = () => {
-    count += 1
-  }
+	let count: number = $state(0);
+	const increment = () => {
+		count += 1;
+	};
 </script>
-
 
 <button onclick={startPlaywright} disabled={loading}>
 	{loading ? 'Starting...' : 'Start Playwright'}
@@ -34,5 +33,5 @@
 {/if}
 
 <button onclick={increment}>
-  count is {count}
+	count is {count}
 </button>
