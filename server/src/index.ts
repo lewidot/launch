@@ -13,7 +13,7 @@ const runner = new PlaywrightRunner({
 
 const app = new Hono()
 	.use(logger())
-	.get('/events', (c) => {
+	.get('/api/output', (c) => {
 		const { readable, unsubscribe } = sseBroker.subscribe();
 
 		c.req.raw.signal.onabort = unsubscribe;
@@ -25,7 +25,7 @@ const app = new Hono()
 			}
 		});
 	})
-	.get('/start', (c) => {
+	.get('/api/start', (c) => {
 		const result = runner.start();
 		if (!result.ok) {
 			return c.json({ error: result.error }, 409);
