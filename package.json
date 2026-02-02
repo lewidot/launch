@@ -12,6 +12,7 @@
 		"build": "bun run build:frontend && bun run build:server",
 		"build:frontend": "bun run --filter frontend build",
 		"build:server": "bun run --filter server build",
+		"start": "cd server && ./server",
 		"format": "prettier --write .",
 		"format:check": "prettier --check ."
 	},
