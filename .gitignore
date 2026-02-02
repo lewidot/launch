@@ -1,44 +1,52 @@
-server/public/
-server/server         # The compiled executable
-frontend/dist/
-
-# dependencies
-**/node_modules
-/.pnp
+# Dependencies
+node_modules/
+.pnp
 .pnp.js
 
-# testing
-/coverage
+# Build outputs
+server/public/
+server/server
+frontend/dist/
+build/
+dist/
+out/
 
-# next.js
-/.next/
-/out/
+# Bun
+*.bun
+bun.lockb
 
-# production
-/build
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
 
-# misc
+# OS
 .DS_Store
 *.pem
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
+# Environment variables
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# vercel
-.vercel
+# Testing
+coverage/
+.nyc_output/
+server/pw-project/test-results/
+server/pw-project/playwright-report/
 
-**/*.trace
-**/*.zip
-**/*.tar.gz
-**/*.tgz
-**/*.log
-package-lock.json
-**/*.bun
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Misc
+*.trace
+*.zip
+*.tar.gz
+*.tgz
+.vercel
