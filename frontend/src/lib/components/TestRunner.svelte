@@ -4,17 +4,22 @@
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import { client } from '$lib/api';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import * as Card from '$lib/components/ui/card';
+	import * as Tabs from '$lib/components/ui/tabs';
 
 	let outputLines = $state<string[]>([]);
-	let isRunning = $state(false);
+	let status = $state<'idle' | 'running-start' | 'running-pull'>('idle');
+	let filter = $state('');
 
 	function connectToSSE() {
 		const eventSource = new EventSource('/api/output');
 
 		eventSource.addEventListener('status', (e) => {
-			const status = JSON.parse(e.data);
-			isRunning = status.state === 'running';
-			if (isRunning) {
+			const data = JSON.parse(e.data);
+			status = data.state;
+			if (status !== 'idle') {
 				outputLines = [];
 			}
 		});
@@ -30,7 +35,7 @@
 
 	const startTests = createMutation(() => ({
 		mutationFn: async () => {
-			const res = await client.api.start.$get();
+			const res = await client.api.start.$post({ json: { filter } });
 			const data = await res.json();
 
 			if ('error' in data) {
@@ -43,29 +48,81 @@
 		}
 	}));
 
+	const pullChanges = createMutation(() => ({
+		mutationFn: async () => {
+			const res = await client.api.pull.$get();
+			const data = await res.json();
+
+			if ('error' in data) {
+				throw new Error(data.error);
+			}
+			return data;
+		},
+		onError: (error) => {
+			toast.error(`Cannot pull changes: ${error.message}`);
+		}
+	}));
+
 	$effect(() => {
 		return connectToSSE();
 	});
 
-	const isBusy = $derived(isRunning || startTests.isPending);
+	const isBusy = $derived(status !== 'idle' || startTests.isPending || pullChanges.isPending);
 </script>
 
 <div class="space-y-6">
-	<Button onclick={() => startTests.mutate()} disabled={isBusy}>
-		{#if isBusy}
-			<Loader2Icon class="animate-spin" />
-			Running...
-		{:else}
-			Run Tests
-		{/if}
-	</Button>
+	<Tabs.Root value="run" class="max-w-sm">
+		<Tabs.List>
+			<Tabs.Trigger value="run">Tests</Tabs.Trigger>
+			<Tabs.Trigger value="pull">Updates</Tabs.Trigger>
+		</Tabs.List>
+		<Tabs.Content value="run">
+			<Card.Root>
+				<Card.Content>
+					<div class="grid gap-2">
+						<Label for="filter">Filter</Label>
+						<Input id="filter" type="text" placeholder="e.g. @smoke" bind:value={filter} />
+					</div>
+				</Card.Content>
+				<Card.Footer>
+					<Button onclick={() => startTests.mutate()} disabled={isBusy}>
+						{#if status === 'running-start'}
+							<Loader2Icon class="animate-spin" />
+							Running...
+						{:else}
+							Run Tests
+						{/if}
+					</Button>
+				</Card.Footer>
+			</Card.Root>
+		</Tabs.Content>
+		<Tabs.Content value="pull">
+			<Card.Root>
+				<Card.Content>
+					<p class="text-sm text-muted-foreground">
+						Pull the latest changes and update dependencies.
+					</p>
+				</Card.Content>
+				<Card.Footer>
+					<Button onclick={() => pullChanges.mutate()} disabled={isBusy} variant="outline">
+						{#if status === 'running-pull'}
+							<Loader2Icon class="animate-spin" />
+							Pulling changes...
+						{:else}
+							Pull Changes
+						{/if}
+					</Button>
+				</Card.Footer>
+			</Card.Root>
+		</Tabs.Content>
+	</Tabs.Root>
 
 	<div class="relative">
 		<div class="mb-2 flex items-center justify-between">
 			<code class="font-mono text-xs text-muted-foreground/60">{outputLines.length} lines</code>
 			<div class="flex items-center gap-2">
 				<span class="relative h-1.5 w-1.5 shrink-0">
-					{#if isRunning}
+					{#if isBusy}
 						<span class="absolute inset-0 animate-ping rounded-full bg-amber-500 opacity-75"></span>
 						<span class="absolute inset-0 rounded-full bg-amber-500"></span>
 					{:else}
@@ -73,7 +130,7 @@
 					{/if}
 				</span>
 				<span class="font-mono text-xs text-muted-foreground">
-					{isRunning ? 'running' : 'idle'}
+					{isBusy ? 'running' : 'idle'}
 				</span>
 			</div>
 		</div>
