@@ -8,5 +8,9 @@
 		"dev": "bun run --hot src/index.ts",
 		"build": "bun build --compile --minify --sourcemap ./src/index.ts --outfile server"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@hono/zod-validator": "^0.7.6",
+		"zod": "^4.3.6"
+	}
 }
