@@ -4,6 +4,8 @@ A web application for managing a Playwright project.
 
 ## Development
 
+Clone the required Playwright project into the `server/pw-project` directory.
+
 To start the backend server run:
 
 ```bash
