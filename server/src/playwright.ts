@@ -44,8 +44,8 @@ export class PlaywrightRunner {
 		console.log('[playwright] spawned pid:', this.proc.pid);
 		this.handler.onStateChange('running-start');
 		this.handler.onOutput(`${args.join(' ')}\n`);
-		this.streamOutput(this.proc.stdout);
-		this.streamOutput(this.proc.stderr);
+		this.streamOutput('stdout', this.proc.stdout);
+		this.streamOutput('stderr', this.proc.stderr);
 
 		// Await the promise for when the process exits and then cleanup state.
 		this.proc.exited.then((code) => {
@@ -64,7 +64,7 @@ export class PlaywrightRunner {
 		}
 
 		console.log('[playwright] pulling latest changes');
-		const args = ['sh', '-c', 'git pull && npm install && npx playwright install'];
+		const args = ['sh', '-c', 'git pull && npm install --include=dev && npx playwright install'];
 		this.proc = Bun.spawn(args, {
 			cwd: this.projectDir,
 			stdout: 'pipe',
@@ -74,8 +74,8 @@ export class PlaywrightRunner {
 
 		this.handler.onStateChange('running-pull');
 		this.handler.onOutput(`${args.join(' ')}\n`);
-		this.streamOutput(this.proc.stdout);
-		this.streamOutput(this.proc.stderr);
+		this.streamOutput('stdout', this.proc.stdout);
+		this.streamOutput('stderr', this.proc.stderr);
 
 		// Await the promise for when the process exits and then cleanup state.
 		this.proc.exited.then((code) => {
@@ -87,15 +87,15 @@ export class PlaywrightRunner {
 		return ok();
 	}
 
-	private async streamOutput(stream: ReadableStream<Uint8Array>) {
-		console.log('[playwright] starting to read stdout');
+	private async streamOutput(name: string, stream: ReadableStream<Uint8Array>) {
+		console.log(`[playwright] starting to read ${name}`);
 		const reader = stream.getReader();
 		const decoder = new TextDecoder();
 
 		while (true) {
 			const { done, value } = await reader.read();
 			if (done) {
-				console.log('[playwright] stdout done');
+				console.log(`[playwright] ${name} done`);
 				break;
 			}
 			if (value) {
