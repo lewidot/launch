@@ -33,7 +33,12 @@ export class SSEBroker {
 	}
 
 	sendEvent(event: string, data: string) {
-		const msg = this.encoder.encode(`event: ${event}\ndata: ${data}\n\n`);
+		// SSE requires each line of data to be prefixed with "data:"
+		const lines = data
+			.split('\n')
+			.map((line) => `data: ${line}`)
+			.join('\n');
+		const msg = this.encoder.encode(`event: ${event}\n${lines}\n\n`);
 		this.broadcast(msg);
 	}
 
