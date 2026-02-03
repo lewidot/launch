@@ -1,10 +1,11 @@
 // playwright.ts
 
 import { ok, err, Result } from 'neverthrow';
+import { ProjectState } from './types';
 
 type OutputHandler = {
 	onOutput: (chunk: string) => void;
-	onStateChange: (state: 'running-start' | 'running-pull' | 'idle', exitCode?: number) => void;
+	onStateChange: (state: ProjectState, exitCode?: number) => void;
 };
 
 export class PlaywrightRunner {

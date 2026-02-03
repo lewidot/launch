@@ -1,8 +1,9 @@
 <script lang="ts">
+	import type { ProjectState } from '../../../../server/src/types';
 	import ControlPanel from './ControlPanel.svelte';
 	import OutputPanel from './OutputPanel.svelte';
 
-	let status = $state<'idle' | 'running-start' | 'running-pull'>('idle');
+	let status = $state<ProjectState>('idle');
 
 	const isBusy = $derived(status !== 'idle');
 </script>

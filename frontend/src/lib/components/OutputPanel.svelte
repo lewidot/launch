@@ -1,6 +1,8 @@
 <script lang="ts">
+	import type { ProjectState } from '../../../../server/src/types';
+
 	type Props = {
-		status: 'idle' | 'running-start' | 'running-pull';
+		status: ProjectState;
 		isBusy: boolean;
 	};
 
