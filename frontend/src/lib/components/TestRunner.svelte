@@ -70,8 +70,8 @@
 	const isBusy = $derived(status !== 'idle' || startTests.isPending || pullChanges.isPending);
 </script>
 
-<div class="space-y-6">
-	<Tabs.Root value="run" class="max-w-sm">
+<div class="flex gap-6">
+	<Tabs.Root value="run" class="w-64 shrink-0">
 		<Tabs.List>
 			<Tabs.Trigger value="run">Tests</Tabs.Trigger>
 			<Tabs.Trigger value="pull">Updates</Tabs.Trigger>
@@ -117,7 +117,7 @@
 		</Tabs.Content>
 	</Tabs.Root>
 
-	<div class="relative">
+	<div class="relative flex-1 pt-5">
 		<div class="mb-2 flex items-center justify-between">
 			<code class="font-mono text-xs text-muted-foreground/60">{outputLines.length} lines</code>
 			<div class="flex items-center gap-2">
@@ -140,7 +140,7 @@
 				class="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--muted))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--muted))_1px,transparent_1px)] bg-size-[14px_14px] opacity-50"
 			></div>
 			<pre
-				class="relative h-[500px] overflow-auto p-4 font-mono text-sm leading-relaxed">{#if outputLines.length === 0}<span
+				class="relative h-[70vh] overflow-auto p-4 font-mono text-sm leading-relaxed">{#if outputLines.length === 0}<span
 						class="text-muted-foreground">$ waiting for test run...</span
 					>{:else}{outputLines.join('')}{/if}</pre>
 		</div>
