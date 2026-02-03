@@ -4,6 +4,8 @@ import { serveStatic } from 'hono/bun';
 import { logger } from 'hono/logger';
 import { SSEBroker } from './sse';
 import { PlaywrightRunner } from './playwright';
+import { zValidator } from '@hono/zod-validator';
+import * as z from 'zod';
 
 const sseBroker = new SSEBroker();
 
@@ -26,8 +28,25 @@ const app = new Hono()
 			}
 		});
 	})
-	.get('/api/start', (c) => {
-		const result = runner.start();
+	.post(
+		'/api/start',
+		zValidator(
+			'json',
+			z.object({
+				filter: z.string()
+			})
+		),
+		(c) => {
+			const validated = c.req.valid('json');
+			const result = runner.start(validated.filter);
+			if (result.isErr()) {
+				return c.json({ error: result.error }, 409);
+			}
+			return c.json({ status: 'started' });
+		}
+	)
+	.get('/api/pull', (c) => {
+		const result = runner.pull();
 		if (result.isErr()) {
 			return c.json({ error: result.error }, 409);
 		}
