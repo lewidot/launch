@@ -1,4 +1,7 @@
 // playwright.ts
+
+import { ok, err, Result } from 'neverthrow';
+
 type OutputHandler = {
 	onOutput: (chunk: string) => void;
 	onStateChange: (state: 'running' | 'idle', exitCode?: number) => void;
@@ -16,21 +19,19 @@ export class PlaywrightRunner {
 		return this.proc !== null;
 	}
 
-	start(): { ok: true } | { ok: false; error: string } {
+	start(): Result<void, string> {
 		if (this.proc) {
 			console.log('[playwright] already running');
-			return { ok: false, error: 'Already running' };
+			return err('Already running');
 		}
 
 		console.log('[playwright] starting process');
-
 		this.proc = Bun.spawn(['npx', 'playwright', 'test', '--reporter', 'list'], {
 			cwd: this.projectDir,
 			stdout: 'pipe'
 		});
 
 		console.log('[playwright] spawned pid:', this.proc.pid);
-
 		this.handler.onStateChange('running');
 		this.streamOutput(this.proc.stdout);
 
@@ -41,7 +42,7 @@ export class PlaywrightRunner {
 			this.proc = null;
 		});
 
-		return { ok: true };
+		return ok();
 	}
 
 	private async streamOutput(stream: ReadableStream<Uint8Array>) {

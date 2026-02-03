@@ -28,7 +28,7 @@ const app = new Hono()
 	})
 	.get('/api/start', (c) => {
 		const result = runner.start();
-		if (!result.ok) {
+		if (result.isErr()) {
 			return c.json({ error: result.error }, 409);
 		}
 		return c.json({ status: 'started' });
