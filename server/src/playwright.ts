@@ -26,14 +26,18 @@ export class PlaywrightRunner {
 		}
 
 		console.log('[playwright] starting process');
-		this.proc = Bun.spawn(['npx', 'playwright', 'test', '--reporter', 'list'], {
+		const args = ['npx', 'playwright', 'test', '--reporter', 'list'];
+		this.proc = Bun.spawn(args, {
 			cwd: this.projectDir,
-			stdout: 'pipe'
+			stdout: 'pipe',
+			stderr: 'pipe'
 		});
 
 		console.log('[playwright] spawned pid:', this.proc.pid);
 		this.handler.onStateChange('running');
+		this.handler.onOutput(args.join(' '));
 		this.streamOutput(this.proc.stdout);
+		this.streamOutput(this.proc.stderr);
 
 		// Await the promise for when the process exits and then cleanup state.
 		this.proc.exited.then((code) => {
