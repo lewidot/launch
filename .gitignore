@@ -10,6 +10,7 @@ frontend/dist/
 build/
 dist/
 out/
+server/pw-project/
 
 # Bun
 *.bun
